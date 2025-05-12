@@ -75,7 +75,7 @@ def is_graph_valid(G, G_CM, expected_nodes_count, base1 = 'A', base2 = 'B', path
         if not check_cycle(G, cycle_nodes):
             return False
 
-    # # генрируем матрицу 
+    # Версия 2 - проверка с пмомощью матрицы Кэли-Менгера
     det = np.linalg.det(G_CM)
     print("\nОпределитель матрицы Кэли-Менгера:", det)
 
