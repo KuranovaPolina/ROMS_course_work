@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+  <option gravity="0 0 -9.81" timestep="0.002">
+    <flag warmstart="enable"/>
+  </option>
+  <visual>
+    <global offwidth="800" offheight="800"/>
+    <quality shadowsize="4096"/>
+    <map force="0.1" fogstart="3" fogend="5" znear="0.1" zfar="50"/>
+  </visual>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+    <material name="arm1" rgba="0.8 0.3 0.3 1"/>
+    <material name="arm2" rgba="0.3 0.8 0.3 1"/>
+    <material name="arm3" rgba="0.3 0.3 0.8 1"/>
+  </asset>
+  <worldbody>
+    <body name="base" pos="0.0 0.0 0.1">
+      <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+      <joint name="joint1" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+      <site name="c1" pos="0 0 0"/>
+      <geom type="capsule" size="0.01" fromto="0 0 0 0.25 0.0 0" material="arm2"/>
+      <body name="link2" pos="0.25 0.0 0">
+        <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint2" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="c2" pos="0 0 0"/>
+        <geom type="capsule" size="0.01" fromto="0 0 0 -0.25 0.5 0" material="arm2"/>
+        <body name="link3" pos="-0.25 0.5 0">
+          <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+          <joint name="joint3" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+          <site name="c3" pos="0 0 0"/>
+          <geom type="capsule" size="0.01" fromto="0 0 0 0.5 0.0 0" material="arm2"/>
+          <body name="end4" pos="0.5 0.0 0">
+            <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+            <joint name="joint4" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+            <site name="c4" pos="0 0 0"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor joint="joint1" name="motor_joint1" gear="0.5" ctrlrange="-0.0005 0.0005"/>
+  </actuator>
+  <tendon>
+    <spatial name="connection_3_4" limited="true" range="0 1e-07" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="c3"/>
+      <site site="c4"/>
+    </spatial>
+  </tendon>
+</mujoco>
