@@ -48,3 +48,23 @@ else:
     print("Невозможно разместить точки в евклидовом пространстве")
     # return False
 
+
+
+def draw_graph(G):
+    # Расположение узлов
+    pos = nx.spring_layout(G, dim=2, weight='length')
+    # pos = my_get_pos(G)
+    print(pos)
+
+    print(G.adj)
+
+    # Рисуем узлы
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=800, font_size=16)
+
+    # Рисуем рёбра
+    nx.draw_networkx_edges(G, pos, width=2)
+
+    edge_labels = {(e[0], e[1]): f"{e[2]:.2f}" for e in G.edges(data='length')}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=12)
+
+    plt.show()

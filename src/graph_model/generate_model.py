@@ -50,7 +50,7 @@ def build_cayley_menger_matrix(G, weight='lenght'):
 
     return CM
 
-def is_graph_valid(G, G_CM, expected_nodes_count, base1 = 'A', base2 = 'B', path = 'C'):
+def is_graph_valid(G, expected_nodes_count, base1 = 'A', base2 = 'B'):
     # Добавили все узлы
     if expected_nodes_count != G.number_of_nodes():
         return False
@@ -75,50 +75,19 @@ def is_graph_valid(G, G_CM, expected_nodes_count, base1 = 'A', base2 = 'B', path
         if not check_cycle(G, cycle_nodes):
             return False
 
+    G_CM = build_cayley_menger_matrix(G, weight='length')
+
     # Версия 2 - проверка с пмомощью матрицы Кэли-Менгера
     det = np.linalg.det(G_CM)
-    print("\nОпределитель матрицы Кэли-Менгера:", det)
 
-    if np.isinf(det):
-        # print("Ошибка: граф содержит недостижимые компоненты")
-        return False
-    elif det <= 0:
-        print("Точки могут быть размещены в евклидовом пространстве")
-    else:
-        # print("Невозможно разместить точки в евклидовом пространстве")
+    if np.isinf(det) or det > 0:
         return False
 
     return True
 
-def draw_graph(G):
-    # Расположение узлов
-    pos = nx.spring_layout(G, dim=2, weight='length')
-    # pos = my_get_pos(G)
-    print(pos)
-
-    print(G.adj)
-
-    # Рисуем узлы
-    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=800, font_size=16)
-
-    # Рисуем рёбра
-    nx.draw_networkx_edges(G, pos, width=2)
-
-    edge_labels = {(e[0], e[1]): f"{e[2]:.2f}" for e in G.edges(data='length')}
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=12)
-
-    plt.show()
-
-def generate_all_graphs(node_ids, min_length=0.0, max_length=5.0, step=1.0):
+def graphs_generator(node_ids, min_length=0.0, max_length=5.0, step=1.0):
     # Генерирует все возможные топологии графа с перебором длин рёбер.
-
     all_edges = list(itertools.combinations(node_ids, 2))
-    graph_topology_count = 0
-
-    print(f"Генерация всех возможных топологий для {len(node_ids)} узлов ({len(all_edges)} возможных рёбер):")
-
-    print(node_ids)
-    print(all_edges)
 
     for r in range(1, len(all_edges) + 1):
         for edge_combination in itertools.combinations(all_edges, r):
@@ -138,14 +107,5 @@ def generate_all_graphs(node_ids, min_length=0.0, max_length=5.0, step=1.0):
                 for u, v, l in length_combination:
                     G.add_edge(u, v, length=l)
 
-                G_CM = build_cayley_menger_matrix(G, weight='length')
-
-                if is_graph_valid(G, G_CM, expected_nodes_count = len(node_ids)):
-                    graph_topology_count += 1
-                    print(f"Топология №{graph_topology_count}:")
-
-                    draw_graph(G)
-                    print(G_CM)
-                    
-
-    print(f"\nВсего подходящих топологий с корректными длинами: {graph_topology_count}")
+                if is_graph_valid(G, expected_nodes_count = len(node_ids)):
+                    yield G.adj
