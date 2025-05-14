@@ -1,6 +1,6 @@
 from lxml import etree
 import numpy as np
-from mechanism_generator import MuJoCoMechanismGenerator
+from mechanism_generator.mechanism_generator import MuJoCoMechanismGenerator
 
 class MechanismParser:
     def __init__(self):
