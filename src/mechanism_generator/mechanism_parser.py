@@ -164,25 +164,16 @@ class MechanismParser:
         # 2. Создаем тендоны к конечным точкам
         self._create_tendons(end_joint_ids)
         
-        # 3. Добавляем моторы с управлением по позиции
+        # 3. Добавляем моторы с управлением по скорости
         for joint_id, data in self.joints.items():
             if data['motor']:
-                # Создаем актуатор для управления по позиции
-                position_actuator = etree.SubElement(self._get_or_create_actuator(), "position")
-                position_actuator.set("name", f"pos_joint{joint_id}")
-                position_actuator.set("joint", f"joint{joint_id}")
-                position_actuator.set("kp", "10.0")  # Коэффициент пропорционального усиления
-                position_actuator.set("ctrlrange", "-3.14159 3.14159")  # Диапазон управления в радианах
-                
-                print(f"Добавлен актуатор позиции для сустава {joint_id}")
-                
-                # Также добавляем компенсацию демпфирования (при необходимости)
+                # Создаем актуатор для управления по скорости
                 velocity_actuator = etree.SubElement(self._get_or_create_actuator(), "velocity")
                 velocity_actuator.set("name", f"vel_joint{joint_id}")
                 velocity_actuator.set("joint", f"joint{joint_id}")
-                velocity_actuator.set("kv", "1.0")  # Коэффициент дифференциального усиления
+                velocity_actuator.set("kv", "10.0")  # Коэффициент дифференциального усиления
                 
-                print(f"Добавлен актуатор скорости для компенсации демпфирования сустава {joint_id}")
+                print(f"Добавлен актуатор скорости для сустава {joint_id}")
         
         print("\nСтруктура созданного механизма:")
         print(f"- Тела: {list(self.bodies.keys())}")
@@ -388,11 +379,17 @@ def create_example_mechanism():
     parser = MechanismParser()
     
     # Пример описания механизма
+#     mechanism_description = """# joint_id pos_x pos_y motor base end connections
+# 1 0.0 0.0 1 1 0 3     # Базовое звено с мотором (кривошип)
+# 2 0.0 1.0 0 0 0 3 4  # Шатун (соединительное звено)
+# 3 1.0 1.0 0 0 0 1 2   # Коромысло (качающееся звено)
+# 4 1.0 0.0 0 0 1 2"""
+
     mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 3     # Базовое звено с мотором (кривошип)
-2 0.0 1.0 0 0 0 3 4  # Шатун (соединительное звено)
-3 1.0 1.0 0 0 0 1 2   # Коромысло (качающееся звено)
-4 1.0 0.0 0 0 1 2"""
+1 -0.3950124685830086 -0.3092843358865642 1 1 0 2 3
+2 -1.0103167186060211 0.36613440005517417 0 0 1 1 4
+3 0.21329809092020777 0.37243998680876184 1 0 0 1 4
+4 2.0 -1.7062144791158373 0 0 0 2 3"""
     
     # Сохраняем описание во временный файл
     with open("mechanism_description.txt", "w") as f:
@@ -403,134 +400,5 @@ def create_example_mechanism():
     parser.build_mechanism()
     parser.save_mechanism("parsed_mechanism.xml")
 
-def create_complex_mechanism():
-    """Создает сложный шестизвенный механизм Стефенсона"""
-    parser = MechanismParser()
-    
-    # Описание шестизвенного механизма Стефенсона
-    mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 2 3     # Базовое звено с мотором (кривошип)
-2 0.4 0.0 1 0 0 1 4 5   # Второе звено с мотором (шатун)
-3 0.0 0.5 0 0 0 1 6     # Третье звено (коромысло)
-4 0.8 0.3 0 0 0 2 6 7   # Четвертое звено (треугольник)
-5 0.4 -0.5 0 0 0 2 8    # Пятое звено (рычаг)
-6 0.5 0.7 0 0 0 3 4     # Шестое звено (качалка)
-7 1.2 0.3 0 0 1 4       # Первая конечная точка (выходное звено)
-8 0.4 -1.0 0 0 1 5      # Вторая конечная точка (выходное звено)"""
-    
-    # Сохраняем описание во временный файл
-    with open("stephenson_mechanism.txt", "w") as f:
-        f.write(mechanism_description)
-    
-    # Парсим и создаем механизм
-    parser.parse_file("stephenson_mechanism.txt")
-    parser.build_mechanism()
-    parser.save_mechanism("stephenson_mechanism.xml")
-    print("Создан шестизвенный механизм Стефенсона, сохранен в stephenson_mechanism.xml")
-
-def create_pantograph_mechanism():
-    """Создает механизм пантографа (для копирования и масштабирования движения)"""
-    parser = MechanismParser()
-    
-    # Описание механизма пантографа
-    mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 2 4     # Базовое звено с мотором
-2 0.5 0.0 0 0 0 1 3 5   # Второе звено (шарнир)
-3 1.0 0.0 0 0 0 2 6     # Третье звено (шарнир)
-4 0.0 0.5 0 0 0 1 5     # Четвертое звено (шарнир)
-5 0.5 0.5 0 0 0 2 4 6   # Пятое звено (центральный шарнир)
-6 1.0 0.5 0 0 1 3 5     # Конечная точка (выходное звено)"""
-    
-    # Сохраняем описание во временный файл
-    with open("pantograph_mechanism.txt", "w") as f:
-        f.write(mechanism_description)
-    
-    # Парсим и создаем механизм
-    parser.parse_file("pantograph_mechanism.txt")
-    parser.build_mechanism()
-    parser.save_mechanism("pantograph_mechanism.xml")
-    print("Создан механизм пантографа, сохранен в pantograph_mechanism.xml")
-
-def create_klann_mechanism():
-    """Создает механизм Кланна (имитирующий походку)"""
-    parser = MechanismParser()
-    
-    # Описание механизма Кланна
-    mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 2 3 4   # Базовое звено с мотором (кривошип)
-2 0.3 0.0 0 0 0 1 5     # Второе звено (качалка)
-3 0.0 0.4 0 0 0 1 6     # Третье звено (стойка)
-4 -0.3 0.0 0 0 0 1 7    # Четвертое звено (стойка)
-5 0.6 0.3 0 0 0 2 8     # Пятое звено (шатун)
-6 0.3 0.7 0 0 0 3 8     # Шестое звено (шатун)
-7 -0.6 0.3 0 0 0 4 9    # Седьмое звено (шатун)
-8 0.8 0.5 0 0 1 5 6     # Первая конечная точка (стопа)
-9 -0.8 0.5 0 0 1 7      # Вторая конечная точка (стопа)"""
-    
-    # Сохраняем описание во временный файл
-    with open("klann_mechanism.txt", "w") as f:
-        f.write(mechanism_description)
-    
-    # Парсим и создаем механизм
-    parser.parse_file("klann_mechanism.txt")
-    parser.build_mechanism()
-    parser.save_mechanism("klann_mechanism.xml")
-    print("Создан механизм Кланна (имитирующий походку), сохранен в klann_mechanism.xml")
-
-def create_star_mechanism():
-    """Создает механизм-звезду с 5 конечными точками"""
-    parser = MechanismParser()
-    
-    # Описание механизма с 5 конечными точками
-    mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 2 3 4 5 6   # Центральное звено с мотором (ступица)
-2 1.0 0.0 1 0 0 1 7         # Первый луч с мотором
-3 0.309 0.951 0 0 0 1 8     # Второй луч
-4 -0.809 0.588 0 0 0 1 9    # Третий луч
-5 -0.809 -0.588 0 0 0 1 10  # Четвертый луч
-6 0.309 -0.951 0 0 0 1 11   # Пятый луч
-7 2.0 0.0 0 0 1 2           # Первая конечная точка
-8 0.618 1.902 0 0 1 3       # Вторая конечная точка
-9 -1.618 1.176 0 0 1 4      # Третья конечная точка
-10 -1.618 -1.176 0 0 1 5    # Четвертая конечная точка
-11 0.618 -1.902 0 0 1 6     # Пятая конечная точка"""
-    
-    # Сохраняем описание во временный файл
-    with open("star_mechanism.txt", "w") as f:
-        f.write(mechanism_description)
-    
-    # Парсим и создаем механизм
-    parser.parse_file("star_mechanism.txt")
-    parser.build_mechanism()
-    parser.save_mechanism("star_mechanism.xml")
-    print("Создан механизм-звезда с 5 конечными точками, сохранен в star_mechanism.xml")
-
-def create_closed_loop_mechanism():
-    """Создает четырехзвенный механизм с замкнутой кинематической цепью"""
-    parser = MechanismParser()
-    
-    # Описание четырехзвенного механизма (4 точки в сумме)
-    mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 0.0 0.0 1 1 0 2     # Базовое звено с мотором (кривошип)
-2 1.0 0.0 0 0 0 3      # Второе звено (шатун)
-3 1.0 1.0 0 0 0 4     # Третье звено (коромысло) - конечная точка
-4 0.0 1.0 0 0 1      # Четвертое звено (стойка), замыкает контур"""
-    
-    # Сохраняем описание во временный файл
-    with open("four_bar_mechanism.txt", "w") as f:
-        f.write(mechanism_description)
-    
-    # Парсим и создаем механизм
-    parser.parse_file("four_bar_mechanism.txt")
-    parser.build_mechanism()
-    parser.save_mechanism("four_bar_mechanism.xml")
-    print("Создан четырехзвенный механизм с замкнутой кинематической цепью, сохранен в four_bar_mechanism.xml")
-
 if __name__ == "__main__":
-    # Выберите какой механизм создать, раскомментировав нужную строку
-    # create_complex_mechanism()
-    # create_pantograph_mechanism()
-    # create_klann_mechanism()
-    # create_star_mechanism()
-    #create_closed_loop_mechanism() 
     create_example_mechanism()
