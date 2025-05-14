@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+  <option gravity="0 0 -9.81" timestep="0.002">
+    <flag warmstart="enable"/>
+  </option>
+  <visual>
+    <global offwidth="800" offheight="800"/>
+    <quality shadowsize="4096"/>
+    <map force="0.1" fogstart="3" fogend="5" znear="0.1" zfar="50"/>
+  </visual>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+    <material name="arm1" rgba="0.8 0.3 0.3 1"/>
+    <material name="arm2" rgba="0.3 0.8 0.3 1"/>
+    <material name="arm3" rgba="0.3 0.3 0.8 1"/>
+  </asset>
+  <option gravity="0 0 -9.81" timestep="0.001">
+    <flag warmstart="enable"/>
+  </option>
+  <default>
+    <joint damping="1.0" armature="0.1" frictionloss="0.1"/>
+  </default>
+  <worldbody>
+    <body name="base" pos="0.0 0.0 0.1">
+      <geom name="base_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <joint name="joint1" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+      <site name="site_1" pos="0 0 0"/>
+      <body name="link2" pos="1.0 0.0 0">
+        <geom name="link2_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint2" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="site_2" pos="0 0 0"/>
+        <geom name="capsule_2_7" type="capsule" fromto="0 0 0 1.0 0.0 0.0" size="0.01" material="arm2"/>
+        <site name="conn_site_2_7" pos="1.0 0.0 0.0"/>
+      </body>
+      <geom name="capsule_1_2" type="capsule" fromto="0 0 0 1.0 0.0 0" size="0.01" material="arm2"/>
+      <body name="link3" pos="0.309 0.951 0">
+        <geom name="link3_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint3" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="site_3" pos="0 0 0"/>
+        <geom name="capsule_3_8" type="capsule" fromto="0 0 0 0.309 0.951 0.0" size="0.01" material="arm2"/>
+        <site name="conn_site_3_8" pos="0.309 0.951 0.0"/>
+      </body>
+      <geom name="capsule_1_3" type="capsule" fromto="0 0 0 0.309 0.951 0" size="0.01" material="arm2"/>
+      <body name="link4" pos="-0.809 0.588 0">
+        <geom name="link4_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint4" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="site_4" pos="0 0 0"/>
+        <geom name="capsule_4_9" type="capsule" fromto="0 0 0 -0.809 0.588 0.0" size="0.01" material="arm2"/>
+        <site name="conn_site_4_9" pos="-0.809 0.588 0.0"/>
+      </body>
+      <geom name="capsule_1_4" type="capsule" fromto="0 0 0 -0.809 0.588 0" size="0.01" material="arm2"/>
+      <body name="link5" pos="-0.809 -0.588 0">
+        <geom name="link5_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint5" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="site_5" pos="0 0 0"/>
+        <geom name="capsule_5_10" type="capsule" fromto="0 0 0 -0.809 -0.588 0.0" size="0.01" material="arm2"/>
+        <site name="conn_site_5_10" pos="-0.809 -0.588 0.0"/>
+      </body>
+      <geom name="capsule_1_5" type="capsule" fromto="0 0 0 -0.809 -0.588 0" size="0.01" material="arm2"/>
+      <body name="link6" pos="0.309 -0.951 0">
+        <geom name="link6_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint6" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <site name="site_6" pos="0 0 0"/>
+        <geom name="capsule_6_11" type="capsule" fromto="0 0 0 0.309 -0.951 0.0" size="0.01" material="arm2"/>
+        <site name="conn_site_6_11" pos="0.309 -0.951 0.0"/>
+      </body>
+      <geom name="capsule_1_6" type="capsule" fromto="0 0 0 0.309 -0.951 0" size="0.01" material="arm2"/>
+    </body>
+    <body name="end7" pos="2.0 0.0 0.1">
+      <geom name="end7_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <site name="site_7" pos="0 0 0"/>
+    </body>
+    <body name="end8" pos="0.618 1.902 0.1">
+      <geom name="end8_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <site name="site_8" pos="0 0 0"/>
+    </body>
+    <body name="end9" pos="-1.618 1.176 0.1">
+      <geom name="end9_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <site name="site_9" pos="0 0 0"/>
+    </body>
+    <body name="end10" pos="-1.618 -1.176 0.1">
+      <geom name="end10_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <site name="site_10" pos="0 0 0"/>
+    </body>
+    <body name="end11" pos="0.618 -1.902 0.1">
+      <geom name="end11_geom" type="cylinder" size="0.05 0.01" material="arm1"/>
+      <site name="site_11" pos="0 0 0"/>
+    </body>
+  </worldbody>
+  <tendon>
+    <spatial name="tendon_3_8" limited="true" range="0 0.0001" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="conn_site_3_8"/>
+      <site site="site_8"/>
+    </spatial>
+    <spatial name="tendon_2_7" limited="true" range="0 0.0001" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="conn_site_2_7"/>
+      <site site="site_7"/>
+    </spatial>
+    <spatial name="tendon_4_9" limited="true" range="0 0.0001" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="conn_site_4_9"/>
+      <site site="site_9"/>
+    </spatial>
+    <spatial name="tendon_6_11" limited="true" range="0 0.0001" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="conn_site_6_11"/>
+      <site site="site_11"/>
+    </spatial>
+    <spatial name="tendon_5_10" limited="true" range="0 0.0001" width="0.003" rgba="0.8 0.8 0.8 1">
+      <site site="conn_site_5_10"/>
+      <site site="site_10"/>
+    </spatial>
+  </tendon>
+  <actuator>
+    <position name="pos_joint1" joint="joint1" kp="10.0" ctrlrange="-3.14159 3.14159"/>
+    <velocity name="vel_joint1" joint="joint1" kv="1.0"/>
+    <position name="pos_joint2" joint="joint2" kp="10.0" ctrlrange="-3.14159 3.14159"/>
+    <velocity name="vel_joint2" joint="joint2" kv="1.0"/>
+  </actuator>
+</mujoco>

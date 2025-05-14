@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mujoco>
+  <option gravity="0 0 -9.81" timestep="0.002">
+    <flag warmstart="enable"/>
+  </option>
+  <visual>
+    <global offwidth="800" offheight="800"/>
+    <quality shadowsize="4096"/>
+    <map force="0.1" fogstart="3" fogend="5" znear="0.1" zfar="50"/>
+  </visual>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+    <material name="arm1" rgba="0.8 0.3 0.3 1"/>
+    <material name="arm2" rgba="0.3 0.8 0.3 1"/>
+    <material name="arm3" rgba="0.3 0.3 0.8 1"/>
+    <material name="groundplane" rgba="0.2 0.3 0.4 1"/>
+  </asset>
+  <worldbody>
+    <light name="spotlight" mode="targetbody" target="world" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" dir="0 1 -1"/>
+    <light name="top" pos="0 0 3" dir="0 0 -1" diffuse="0.6 0.6 0.6" specular="0.3 0.3 0.3"/>
+    <geom name="ground" type="plane" material="groundplane" size="5 5 0.1"/>
+    <camera name="fixed" pos="0 -3 2" xyaxes="1 0 0 0 0.7 0.7"/>
+    <body name="link_1" pos="0.0 0.0 0.1">
+      <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+      <joint name="joint_1" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+      <body name="link_2" pos="0.0 0.5 0.1">
+        <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint_2" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+        <body name="link_4" pos="0.0 1.0 0.1">
+          <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+          <joint name="joint_4" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+          <site name="site_4" pos="0 0 0"/>
+        </body>
+        <geom type="capsule" size="0.01" fromto="0 0 0 0.0 0.5 0" material="arm2"/>
+      </body>
+      <geom type="capsule" size="0.01" fromto="0 0 0 0.0 0.5 0" material="arm2"/>
+      <body name="link_3" pos="0.5 0.0 0.1">
+        <geom type="cylinder" size="0.05 0.01" material="arm1"/>
+        <joint name="joint_3" type="hinge" axis="0 0 1" pos="0 0 -0.05"/>
+      </body>
+      <geom type="capsule" size="0.01" fromto="0 0 0 0.5 0.0 0" material="arm2"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor joint="joint_1" name="motor_joint_1" gear="100" ctrlrange="-0.01 0.01"/>
+  </actuator>
+</mujoco>
