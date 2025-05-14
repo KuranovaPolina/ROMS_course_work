@@ -1,12 +1,6 @@
-# from graph_model.graph_class import KinematicGraph
-
 import itertools
 import networkx as nx
 import numpy as np
-
-import matplotlib.pyplot as plt
-
-# TODO - A, B - base nodes; C - pass node
 
 def polygon_exists(sides):
     total = sum(sides)
@@ -75,9 +69,9 @@ def is_graph_valid(G, expected_nodes_count, base1 = 'A', base2 = 'B'):
         if not check_cycle(G, cycle_nodes):
             return False
 
+    # Версия 2 - проверка с пмомощью матрицы Кэли-Менгера
     G_CM = build_cayley_menger_matrix(G, weight='length')
 
-    # Версия 2 - проверка с пмомощью матрицы Кэли-Менгера
     det = np.linalg.det(G_CM)
 
     if np.isinf(det) or det > 0:
