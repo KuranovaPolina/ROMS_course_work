@@ -18,8 +18,8 @@ def get_function_trajectory(func_str, x_min=-10, x_max=10, N=1000):
 
 def MSE_func(model_xml, func):
     # Загрузка модели
-    # model = mujoco.MjModel.from_xml_string(model_xml)
-    model = mujoco.MjModel.from_xml_path("src/models/parsed_mechanism.xml")
+    model = mujoco.MjModel.from_xml_string(model_xml)
+    #model = mujoco.MjModel.
     data = mujoco.MjData(model)
 
     # Параметры симуляции
@@ -40,7 +40,7 @@ def MSE_func(model_xml, func):
     with mujoco.viewer.launch_passive(model, data) as viewer:
         for i in range(N):
             # Простое управление: синусоидальный сигнал
-            data.ctrl[0] = 5.0 * np.sin(2 * np.pi * i * dt)
+            data.ctrl[0] = (3.14 / 180) * i
 
             # Шаг симуляции
             mujoco.mj_step(model, data)

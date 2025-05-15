@@ -103,9 +103,17 @@ def topology_to_mechanism_format(connections, base_node='A', end_nodes=None, mot
         is_base = 1 if node_label == base_node else 0
         is_end = 1 if node_label in end_nodes else 0
         
-        # Определяем связи
+        # Определяем связи, исключая соединения между base и end точками
         node_connections = connections[node_label]
-        connection_ids = [node_mapping[conn] for conn in node_connections.keys()]
+        connection_ids = []
+        
+        for conn in node_connections.keys():
+            # Исключаем соединения между base и end точками
+            if (node_label == base_node and conn in end_nodes) or \
+               (node_label in end_nodes and conn == base_node):
+                print(f"Исключение соединения между base ({node_label}) и end ({conn})")
+                continue
+            connection_ids.append(node_mapping[conn])
         
         # Формируем строку
         line = f"{node_id} {pos_x} {pos_y} {is_motor} {is_base} {is_end} {' '.join(map(str, connection_ids))}"
@@ -137,7 +145,7 @@ def parse_topology_description(topology_text):
 
 def main():
     # Пример использования
-    connections_text = """{'A': {'B': {'length': 1.0}, 'C': {'length': 1.0}}, 'B': {'A': {'length': 1.0}, 'D': {'length': 4.0}}, 'C': {'A': {'length': 1.0}, 'D': {'length': 3.0}}, 'D': {'B': {'length': 4.0}, 'C': {'length': 3.0}}}"""
+    connections_text = """{"A": {"C": {"length": 1.0}}, "B": {"D": {"length": 1.0}}, "C": {"A": {"length": 1.0}, "D": {"length": 1.0}}, "D": {"B": {"length": 1.0}, "C": {"length": 1.0}}}"""
     
     # Парсим только соединения
     connections = eval(connections_text)

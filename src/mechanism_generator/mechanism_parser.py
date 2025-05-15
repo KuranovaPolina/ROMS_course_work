@@ -1,6 +1,6 @@
 from lxml import etree
 import numpy as np
-from mechanism_generator import MuJoCoMechanismGenerator
+from mechanism_generator.mechanism_generator import MuJoCoMechanismGenerator
 
 class MechanismParser:
     def __init__(self):
@@ -387,10 +387,10 @@ def create_example_mechanism():
 # 4 1.0 0.0 0 0 1 2"""
 
     mechanism_description = """# joint_id pos_x pos_y motor base end connections
-1 -0.3950124685830086 -0.3092843358865642 1 1 0 2 3
-2 -1.0103167186060211 0.36613440005517417 0 0 1 1 4
-3 0.21329809092020777 0.37243998680876184 1 0 0 1 4
-4 2.0 -1.7062144791158373 0 0 0 2 3"""
+1 0.0 0.0 1 1 0 3
+2 1.0 0.0 0 0 1 4
+3 0.0 1.0 0 0 0 1 4 
+4 1.0 1.0 0 0 0 2 3"""
     
     # Сохраняем описание во временный файл
     with open("mechanism_description.txt", "w") as f:

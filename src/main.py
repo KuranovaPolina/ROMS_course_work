@@ -3,7 +3,7 @@ from metric import MSE_func
 from mechanism_generator.simulate_graph import generate_mujoco_xml
 
 if __name__ == "__main__":
-    node_ids = ['A', 'B', 'C', 'D']  # Задаем узлы для генерации топологий
+    node_ids = ['A', 'B', 'C', 'D', 'E']  # Задаем узлы для генерации топологий
 
     func = "5 * sqrt(1 - (x**2) / (3**2))"
 

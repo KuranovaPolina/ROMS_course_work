@@ -1,3 +1,4 @@
+# joint_id pos_x pos_y motor base end connections
 1 0.0 0.0 1 1 0 3
 2 1.0 0.0 0 0 1 4
 3 0.0 1.0 0 0 0 1 4 
