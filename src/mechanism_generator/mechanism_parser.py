@@ -1,6 +1,6 @@
 from lxml import etree
 import numpy as np
-from mechanism_generator.mechanism_generator import MuJoCoMechanismGenerator
+from mechanism_generator import MuJoCoMechanismGenerator
 
 class MechanismParser:
     def __init__(self):
@@ -164,16 +164,17 @@ class MechanismParser:
         # 2. Создаем тендоны к конечным точкам
         self._create_tendons(end_joint_ids)
         
-        # 3. Добавляем моторы с управлением по скорости
+        # 3. Добавляем моторы с управлением по позиции
         for joint_id, data in self.joints.items():
             if data['motor']:
-                # Создаем актуатор для управления по скорости
-                velocity_actuator = etree.SubElement(self._get_or_create_actuator(), "velocity")
+                # Создаем актуатор для управления по позиции
+                velocity_actuator = etree.SubElement(self._get_or_create_actuator(), "position")
                 velocity_actuator.set("name", f"vel_joint{joint_id}")
                 velocity_actuator.set("joint", f"joint{joint_id}")
                 velocity_actuator.set("kv", "10.0")  # Коэффициент дифференциального усиления
+                velocity_actuator.set("ctrlrange", "-3.14 3.14")
                 
-                print(f"Добавлен актуатор скорости для сустава {joint_id}")
+                print(f"Добавлен актуатор позиции для сустава {joint_id}")
         
         print("\nСтруктура созданного механизма:")
         print(f"- Тела: {list(self.bodies.keys())}")

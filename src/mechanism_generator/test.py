@@ -71,12 +71,7 @@ def test_simple_graph():
     Тестирует простой четырехзвенный механизм
     """
     # Определяем граф
-    connections = {
-        'A': {'B': {'length': 1.0}, 'C': {'length': 1.0}}, 
-        'B': {'A': {'length': 1.0}, 'D': {'length': 4.0}}, 
-        'C': {'A': {'length': 1.0}, 'D': {'length': 3.0}}, 
-        'D': {'B': {'length': 4.0}, 'C': {'length': 3.0}}
-    }
+    connections = {"A": {"C": {"length": 1.0}}, "B": {"D": {"length": 1.0}}, "C": {"A": {"length": 1.0}, "D": {"length": 1.0}}, "D": {"B": {"length": 1.0}, "C": {"length": 1.0}}}
     
     # Запускаем симуляцию и получаем XML
     xml = test_with_mujoco(connections)
