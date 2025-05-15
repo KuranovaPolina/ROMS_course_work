@@ -4,7 +4,7 @@ from mechanism_generator.simulate_graph import generate_mujoco_xml
 
 if __name__ == "__main__":
     node_ids = ['A', 'B', 'C', 'D', 'E']  # Задаем узлы для генерации топологий
-    func = "(2*sin(x)**2 + 3*cos(x)**3) - 2"
+    func = "(2*sin(x)**2 + 3*cos(x)**3 - 3)"
     
     # Список для хранения истории
     history = []
@@ -24,11 +24,15 @@ if __name__ == "__main__":
         print(f'id {n}, mse:{mse_score}')
 
         n += 1
-        if n >= 50:
+        if n >= 10:
             break
     
     # Находим модель с минимальным MSE
-    best_model = min(history, key=lambda x: x['mse'])
-    print(f"Лучшая модель: ID = {best_model['id']}, MSE = {best_model['mse']}")
-
-    MSE_func(best_model['xml'], func, site=3, vis_sim=True, vis_plt=True)
+    if history:
+        best_model = min(history, key=lambda x: x['mse'])
+        print(f"Лучшая модель: ID = {best_model['id']}, MSE = {best_model['mse']}")
+        
+        # Визуализация лучшей модели
+        MSE_func(best_model['xml'], func, site=4, vis_sim=True, vis_plt=True)
+    else:
+        print("История пуста, модели не сгенерированы.")

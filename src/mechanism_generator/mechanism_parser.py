@@ -172,7 +172,7 @@ class MechanismParser:
                 velocity_actuator.set("name", f"vel_joint{joint_id}")
                 velocity_actuator.set("joint", f"joint{joint_id}")
                 velocity_actuator.set("kv", "10.0")  # Коэффициент дифференциального усиления
-                velocity_actuator.set("ctrlrange", "-9.42 9.42")
+                velocity_actuator.set("ctrlrange", "-12.56 12.56")
                 
                 print(f"Добавлен актуатор позиции для сустава {joint_id}")
         

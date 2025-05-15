@@ -25,6 +25,8 @@ class MuJoCoMechanismGenerator:
         option.set("timestep", "0.002")
         flag = etree.SubElement(option, "flag")
         flag.set("warmstart", "enable")
+        # Отключаем контакты между суставами (глобальная настройка)
+        flag.set("contact", "disable")
 
         # Добавляем визуальные настройки
         visual = etree.SubElement(self.root, "visual")
