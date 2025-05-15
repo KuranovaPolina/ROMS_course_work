@@ -20,7 +20,7 @@ def get_function_trajectory(func_str, x_min=-10, x_max=10, N=1000):
     target_traj[:, 1] = y_vals
     return target_traj
 
-def MSE_func(model_xml, func, visualize=True):
+def MSE_func(model_xml, func, site, vis_sim=True, vis_plt=True):
     # Загрузка модели
     model = mujoco.MjModel.from_xml_string(model_xml)
     data = mujoco.MjData(model)
@@ -39,15 +39,14 @@ def MSE_func(model_xml, func, visualize=True):
 
     actual_traj = np.zeros((N, 2))
 
-    tracker_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, "site_4")
-    if tracker_id == -1:
-        raise ValueError("Сайт 'site_3' не найден в модели")
+    site_name = f"site_{site}"
+    tracker_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, site_name)
 
     # Максимальный угол из ctrlrange актуатора
-    max_angle = 3.14*3 # Исправлено: соответствует ctrlrange из XML
+    max_angle = 3.14*3  # Исправлено: соответствует ctrlrange из XML
 
     # Запуск симуляции
-    if visualize:
+    if vis_sim:
         # Запуск визуализатора
         with mujoco.viewer.launch_passive(model, data) as viewer:
             for i in range(N):
@@ -83,22 +82,25 @@ def MSE_func(model_xml, func, visualize=True):
             tracker_pos = data.site_xpos[tracker_id][:2]
             actual_traj[i] = tracker_pos
 
+            print(tracker_pos)
+
     # MSE между целевой и реальной траекторией
     mse = np.mean((actual_traj - target_traj) ** 2)
 
     print(f"MSE: {mse}")
 
-    # Визуализация траекторий
-    plt.figure(figsize=(8, 8))
-    plt.plot(target_traj[:, 0], target_traj[:, 1], 'b-', label='Целевая траектория')
-    plt.plot(actual_traj[:, 0], actual_traj[:, 1], 'r--', label='Реальная траектория')
-    plt.xlabel('X (м)')
-    plt.ylabel('Y (м)')
-    plt.title('Сравнение траекторий')
-    plt.legend()
-    plt.grid(True)
-    plt.axis('equal')
-    plt.savefig('trajectory_comparison.png')
-    plt.show()
+    # Визуализация траекторий, только если visualize_plots=True
+    if vis_plt:
+        plt.figure(figsize=(8, 8))
+        plt.plot(target_traj[:, 0], target_traj[:, 1], 'b-', label='Целевая траектория')
+        plt.plot(actual_traj[:, 0], actual_traj[:, 1], 'r--', label='Реальная траектория')
+        plt.xlabel('X (м)')
+        plt.ylabel('Y (м)')
+        plt.title('Сравнение траекторий')
+        plt.legend()
+        plt.grid(True)
+        plt.axis('equal')
+        plt.savefig('trajectory_comparison.png')
+        plt.show()
 
     return mse
