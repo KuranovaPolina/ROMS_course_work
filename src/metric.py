@@ -37,41 +37,28 @@ def MSE_func(model_xml, func, site, vis_sim=True, vis_plt=True):
     # Функция траектории движения
     target_traj = get_function_trajectory(func, x_min=0, x_max=3, N=N)
 
-    # Массивы для хранения траекторий
-    actual_traj = np.zeros((N, 2))  # Траектория основного сайта
-    prev_traj = np.zeros((N, 2))    # Траектория предыдущего сайта
-    next_traj = np.zeros((N, 2))    # Траектория следующего сайта
+    # Массив для хранения траектории
+    actual_traj = np.zeros((N, 2))  # Траектория для X и Y
+    all_coords = np.zeros((N, 3))   # Полные 3D-координаты
 
-    # Идентификаторы сайтов
+    # Идентификатор сайта
     site_name = f"site_{site}"
     tracker_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, site_name)
     if tracker_id == -1:
         raise ValueError(f"Сайт {site_name} не найден в модели")
 
-    # Проверяем существование предыдущего сайта
-    prev_site_name = f"site_{site - 1}"
-    prev_tracker_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, prev_site_name)
-    has_prev_site = prev_tracker_id != -1
-
-    # Проверяем существование следующего сайта
-    next_site_name = f"site_{site + 1}"
-    next_tracker_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, next_site_name)
-    has_next_site = next_tracker_id != -1
-
     # Максимальный угол из ctrlrange актуатора
     max_angle = 3.14 * 4  # Соответствует ctrlrange из XML
 
-    # Получаем начальные позиции точек
+    # Получаем начальную позицию точки
     mujoco.mj_step(model, data)  # Выполняем один шаг, чтобы инициализировать позиции
     initial_pos = data.site_xpos[tracker_id][:2].copy()  # Начальная позиция основного сайта
-    initial_prev_pos = data.site_xpos[prev_tracker_id][:2].copy() if has_prev_site else None
-    initial_next_pos = data.site_xpos[next_tracker_id][:2].copy() if has_next_site else None
 
     # Запуск симуляции
     if vis_sim:
         with mujoco.viewer.launch_passive(model, data) as viewer:
             for i in range(N):
-                # Плавное увеличение угла
+                # Плавное увеличение угла (как в первом коде)
                 current_angle = max_angle * (i / N)
                 data.ctrl[0] = current_angle
                 if model.nu > 1:
@@ -79,18 +66,12 @@ def MSE_func(model_xml, func, site, vis_sim=True, vis_plt=True):
 
                 # Шаг симуляции
                 mujoco.mj_step(model, data)
+                mujoco.mj_forward(model, data)  # Явное обновление физики (как во втором коде)
 
-                # Сохраняем позиции сайтов относительно начальных
-                tracker_pos = data.site_xpos[tracker_id][:2]
-                actual_traj[i] = tracker_pos - initial_pos
-
-                if has_prev_site:
-                    prev_pos = data.site_xpos[prev_tracker_id][:2]
-                    prev_traj[i] = prev_pos - initial_prev_pos
-
-                if has_next_site:
-                    next_pos = data.site_xpos[next_tracker_id][:2]
-                    next_traj[i] = next_pos - initial_next_pos
+                # Сохраняем позицию сайта
+                tracker_pos = data.site_xpos[tracker_id].copy()
+                all_coords[i] = tracker_pos  # Сохраняем все координаты (как во втором коде)
+                actual_traj[i] = tracker_pos[:2] - initial_pos  # Сдвиг относительно начальной позиции (как в первом коде)
 
                 viewer.sync()
                 time.sleep(dt)
@@ -104,40 +85,32 @@ def MSE_func(model_xml, func, site, vis_sim=True, vis_plt=True):
 
             # Шаг симуляции
             mujoco.mj_step(model, data)
+            mujoco.mj_forward(model, data)
 
-            # Сохраняем позиции сайтов относительно начальных
-            tracker_pos = data.site_xpos[tracker_id][:2]
-            actual_traj[i] = tracker_pos - initial_pos
+            # Сохраняем позицию сайта
+            tracker_pos = data.site_xpos[tracker_id].copy()
+            all_coords[i] = tracker_pos
+            actual_traj[i] = tracker_pos[:2] - initial_pos
 
-            if has_prev_site:
-                prev_pos = data.site_xpos[prev_tracker_id][:2]
-                prev_traj[i] = prev_pos - initial_prev_pos
+    # Проверка плоскости траектории (как во втором коде)
+    print(f"Диапазон X: {np.min(all_coords[:, 0]):.3f} до {np.max(all_coords[:, 0]):.3f}")
+    print(f"Диапазон Y: {np.min(all_coords[:, 1]):.3f} до {np.max(all_coords[:, 1]):.3f}")
+    print(f"Диапазон Z: {np.min(all_coords[:, 2]):.3f} до {np.max(all_coords[:, 2]):.3f}")
+    z_variation = np.max(all_coords[:, 2]) - np.min(all_coords[:, 2])
+    if z_variation < 1e-6:
+        print("Траектория плоская (все точки имеют одинаковую Z координату)")
 
-            if has_next_site:
-                next_pos = data.site_xpos[next_tracker_id][:2]
-                next_traj[i] = next_pos - initial_next_pos
-
-    # Расчет MSE для каждой траектории
+    # Расчет MSE
     mse = np.mean((actual_traj - target_traj) ** 2)
-    mse_prev = np.mean((prev_traj - target_traj) ** 2) if has_prev_site else None
-    mse_next = np.mean((next_traj - target_traj) ** 2) if has_next_site else None
 
     # Вывод MSE в консоль
     print(f"MSE (site_{site}): {mse}")
-    if has_prev_site:
-        print(f"MSE (site_{site-1}): {mse_prev}")
-    if has_next_site:
-        print(f"MSE (site_{site+1}): {mse_next}")
 
-    # Визуализация траекторий
+    # Визуализация траекторий (как в первом коде)
     if vis_plt:
         plt.figure(figsize=(10, 8))
         plt.plot(target_traj[:, 0], target_traj[:, 1], 'b-', label='Целевая траектория')
         plt.plot(actual_traj[:, 0], actual_traj[:, 1], 'r--', label=f'Реальная траектория (site_{site})')
-        if has_prev_site:
-            plt.plot(prev_traj[:, 0], prev_traj[:, 1], 'g--', label=f'Реальная траектория (site_{site-1})')
-        if has_next_site:
-            plt.plot(next_traj[:, 0], next_traj[:, 1], 'm--', label=f'Реальная траектория (site_{site+1})')
         plt.xlabel('X (м)')
         plt.ylabel('Y (м)')
         plt.title('Сравнение траекторий')
