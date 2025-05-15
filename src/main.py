@@ -24,7 +24,7 @@ if __name__ == "__main__":
         print(f'id {n}, mse:{mse_score}')
 
         n += 1
-        if n >= 10:
+        if n >= 50:
             break
     
     # Находим модель с минимальным MSE

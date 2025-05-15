@@ -82,7 +82,7 @@ def MSE_func(model_xml, func, site, vis_sim=True, vis_plt=True):
             tracker_pos = data.site_xpos[tracker_id][:2]
             actual_traj[i] = tracker_pos
 
-            print(tracker_pos)
+            #print(tracker_pos)
 
     # MSE между целевой и реальной траекторией
     mse = np.mean((actual_traj - target_traj) ** 2)
